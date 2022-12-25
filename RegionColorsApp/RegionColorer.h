@@ -19,6 +19,9 @@ public:
     std::map<std::string, std::string> AssignColorsToRegions(std::vector<Region*> Regions);
 
 private:
+    Region* SelectNextRegionForAssignment(std::vector<Region*>* UnassignedRegions, std::map<std::string, std::string>* ColorAssignments);
+    std::string PickColorForAssignment(Region* Region, std::map<std::string,std::string>* ColorAssignments);
+    
     // Makes a sub-vector of all regions, which contains regions that have not yet been assigned a color
     // based on provided color assignments
     std::vector<Region*> CalculateUnassignedRegions(std::vector<Region*>* AllRegions, std::map<std::string, std::string>* ColorAssignments);

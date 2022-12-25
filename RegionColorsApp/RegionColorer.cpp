@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "ColorAssignmentException.h"
+
 RegionColorer::RegionColorer(std::vector<std::string> ColorIds)
 {
     this->ColorIds = ColorIds;
@@ -11,41 +13,23 @@ std::map<std::string, std::string>  RegionColorer::AssignColorsToRegions(std::ve
 {
     std::cout << "Assigning " << ColorIds.size() << " colors to " << Regions.size() << " regions." << std::endl;
 
-    // Create a map of assigned colors
     std::map<std::string, std::string> ColorAssignments = {};
 
     while (ColorAssignments.size() < Regions.size())
     {
         std::vector<Region*> UnassignedRegions = CalculateUnassignedRegions(&Regions, &ColorAssignments);
-        std::vector<Region*> MRVRegions = CalculateMRVRegions(&UnassignedRegions, &ColorAssignments);
+        
+        Region* NextRegionForAssignment = SelectNextRegionForAssignment(&UnassignedRegions, &ColorAssignments);
 
-        Region* RegionToAssign;
-        
-        if (MRVRegions.empty())
+        if (NextRegionForAssignment == nullptr)
         {
-            // Throw a runtime exception
-            return {};
+            throw ColorAssignmentException();
         }
         
-        if (MRVRegions.size() == 1)
-        {
-            RegionToAssign = MRVRegions[0];
-        }
-        else
-        {
-            RegionToAssign = GetRegionWithMostUnassignedNeighbours(&MRVRegions, &ColorAssignments);
-        }
-        
-        std::cout << "Next region to assign: " << RegionToAssign->GetRegionId() << std::endl;
-        
-        //     Least constraining value:
-        //       Once a region is selected, choose a color that will rule out the least adjacent region colors
-        //       If there are multiple colors to choose from, choose a random color
-        std::string SuitableColorId = CalculateAvailableColors(RegionToAssign, &ColorAssignments)[0];
-        
-        ColorAssignments[RegionToAssign->GetRegionId()] = SuitableColorId;
+        std::string SuitableColorId = PickColorForAssignment(NextRegionForAssignment, &ColorAssignments);
+        ColorAssignments[NextRegionForAssignment->GetRegionId()] = SuitableColorId;
 
-        std::cout << "Assigned color " << SuitableColorId << " to " << RegionToAssign->GetRegionId() << std::endl;
+        std::cout << "Assigned color " << SuitableColorId << " to " << NextRegionForAssignment->GetRegionId() << std::endl;
     }
     
     return ColorAssignments;
@@ -63,6 +47,57 @@ std::vector<Region*> RegionColorer::CalculateUnassignedRegions(std::vector<Regio
     }
 
     return UnassignedRegions;
+}
+
+Region* RegionColorer::SelectNextRegionForAssignment(std::vector<Region*>* UnassignedRegions, std::map<std::string, std::string>* ColorAssignments)
+{
+    std::vector<Region*> MRVRegions = CalculateMRVRegions(UnassignedRegions, ColorAssignments);
+
+    if (MRVRegions.empty())
+    {
+        return nullptr;
+    }
+
+    Region* RegionToAssign;
+        
+    if (MRVRegions.size() == 1)
+    {
+        RegionToAssign = MRVRegions[0];
+    }
+    else
+    {
+        RegionToAssign = GetRegionWithMostUnassignedNeighbours(&MRVRegions, ColorAssignments);
+    }
+
+    return RegionToAssign;
+}
+
+std::string RegionColorer::PickColorForAssignment(Region* Region, std::map<std::string, std::string>* ColorAssignments)
+{
+    const std::vector<std::string> AvailableColors = CalculateAvailableColors(Region, ColorAssignments);
+
+    std::string SuitableColorId;
+    if (AvailableColors.empty())
+    {
+        throw ColorAssignmentException();
+    }
+    if (AvailableColors.size() == 1)
+    {
+        SuitableColorId = AvailableColors[0];
+    }
+    else
+    {
+        // If there are multiple colors, choose the one which will rule out the least neighbouring values
+
+        // Take each neighbour
+        // Check if color is available on the neighbour
+        // If yes, increase counter
+        // Repeat for each color
+        // Take color with lowest counter value
+        SuitableColorId = AvailableColors[0];
+    }
+
+    return SuitableColorId;
 }
 
 std::vector<Region*> RegionColorer::CalculateMRVRegions(std::vector<Region*>* Regions, std::map<std::string, std::string>* ColorAssignments)

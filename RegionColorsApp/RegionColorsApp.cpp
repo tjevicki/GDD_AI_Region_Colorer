@@ -1,7 +1,11 @@
 
+#include <iostream>
+
 #include "RegionColorer.h"
 #include "Region.h"
 #include <vector>
+
+#include "ColorAssignmentException.h"
 
 int main(int argc, char* argv[])
 {
@@ -34,7 +38,15 @@ int main(int argc, char* argv[])
     NewSouthWales->SetNeighbouringRegions(std::vector<Region*> { Queensland, SouthernAustralia, Victoria });
     Victoria->SetNeighbouringRegions(std::vector<Region*> { NewSouthWales, SouthernAustralia });
     Tasmania->SetNeighbouringRegions(std::vector<Region*> {});
-    
-    std::map<std::string, std::string> RegionsWithColors = Colorer->AssignColorsToRegions(SampleRegions);
-    return 0;
+
+    try
+    {
+        std::map<std::string, std::string> RegionsWithColors = Colorer->AssignColorsToRegions(SampleRegions);
+        return 0;
+    }
+    catch (ColorAssignmentException& e)
+    {
+        std::cout << "Algorithm failed to assign colors.";
+        return -1;
+    }
 }
