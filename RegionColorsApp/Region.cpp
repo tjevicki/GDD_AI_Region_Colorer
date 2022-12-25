@@ -1,15 +1,27 @@
 ﻿#include "Region.h"
 
-Region::Region(int RegionId, std::vector<Region> NeighbouringRegions)
+Region::Region(std::string RegionId, std::vector<Region*> NeighbouringRegions)
 {
     this->RegionId = RegionId;
     this->NeighbouringRegions = NeighbouringRegions;
 }
 
-int Region::GetRegionId()
+std::string Region::GetRegionId()
 {
     return RegionId;
 }
+
+std::vector<Region*> Region::GetNeighbouringRegions()
+{
+    return NeighbouringRegions;
+}
+
+void Region::SetNeighbouringRegions(std::vector<Region*> NewNeighbouringRegions)
+{
+    this->NeighbouringRegions = NewNeighbouringRegions;
+}
+
+
 
 
 

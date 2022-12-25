@@ -1,17 +1,18 @@
 ﻿#pragma once
+#include <string>
 #include <vector>
 
 struct Region
 {
 public:
-    Region(int RegionId, std::vector<Region> NeighbouringRegions);
+    Region(std::string RegionId, std::vector<Region*> NeighbouringRegions);
 
 private:
-    int RegionId;
-    std::vector<Region> NeighbouringRegions;
+    std::string RegionId;
+    std::vector<Region*> NeighbouringRegions;
 
 public:
-    int GetRegionId();
-    std::vector<Region> GetNeighbouringRegions();
-    std::vector<Region> SetNeighbouringRegions();
+    std::string GetRegionId();
+    std::vector<Region*> GetNeighbouringRegions();
+    void SetNeighbouringRegions(std::vector<Region*> NewNeighbouringRegions);
 };
