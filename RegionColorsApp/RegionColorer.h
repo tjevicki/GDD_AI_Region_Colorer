@@ -28,4 +28,6 @@ private:
 
     // Makes a vecter of all colors that can be assigned to the provided region so that it differs from all adjacent regions' colors
     std::vector<std::string> CalculateAvailableColors(Region* Region, std::map<std::string, std::string>* ColorAssignments);
+
+    Region* GetRegionWithMostUnassignedNeighbours(std::vector<Region*>* Regions, std::map<std::string, std::string>* ColorAssignments);
 };

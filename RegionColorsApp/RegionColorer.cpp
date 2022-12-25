@@ -33,7 +33,7 @@ std::map<std::string, std::string>  RegionColorer::AssignColorsToRegions(std::ve
         }
         else
         {
-            RegionToAssign = MRVRegions[0];
+            RegionToAssign = GetRegionWithMostUnassignedNeighbours(&MRVRegions, &ColorAssignments);
         }
         
         std::cout << "Next region to assign: " << RegionToAssign->GetRegionId() << std::endl;
@@ -111,6 +111,38 @@ std::vector<std::string> RegionColorer::CalculateAvailableColors(Region* Region,
     
     return AvailableColors;
 }
+
+Region* RegionColorer::GetRegionWithMostUnassignedNeighbours(std::vector<Region*>* Regions, std::map<std::string, std::string>* ColorAssignments)
+{
+    Region* RegionWithMostUnassignedNeighbours = nullptr;
+    
+    int MostUnassignedNeighbours = 0;
+    for (const auto& Region : *Regions)
+    {
+        int UnassignedNeighbours = 0;
+        for (const auto& Neighbour : Region->GetNeighbouringRegions())
+        {
+            if (ColorAssignments->count(Neighbour->GetRegionId()) == 0)
+            {
+                UnassignedNeighbours += 1;
+            }
+        }
+
+        if (UnassignedNeighbours > MostUnassignedNeighbours)
+        {
+            RegionWithMostUnassignedNeighbours = Region;
+            MostUnassignedNeighbours = UnassignedNeighbours;
+        }
+    }
+
+    if (RegionWithMostUnassignedNeighbours == nullptr)
+    {
+        RegionWithMostUnassignedNeighbours = (*Regions)[0];
+    }
+
+    return RegionWithMostUnassignedNeighbours;
+}
+
 
 
 
