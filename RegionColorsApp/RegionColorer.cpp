@@ -26,7 +26,7 @@ std::map<std::string, std::string>  RegionColorer::AssignColorsToRegions(std::ve
             throw ColorAssignmentException();
         }
         
-        std::string SuitableColorId = PickColorForAssignment(NextRegionForAssignment, &ColorAssignments);
+        std::string SuitableColorId = PickColorForAssignment(NextRegionForAssignment, &UnassignedRegions, &ColorAssignments);
         ColorAssignments[NextRegionForAssignment->GetRegionId()] = SuitableColorId;
 
         std::cout << "Assigned color " << SuitableColorId << " to " << NextRegionForAssignment->GetRegionId() << std::endl;
@@ -72,7 +72,7 @@ Region* RegionColorer::SelectNextRegionForAssignment(std::vector<Region*>* Unass
     return RegionToAssign;
 }
 
-std::string RegionColorer::PickColorForAssignment(Region* Region, std::map<std::string, std::string>* ColorAssignments)
+std::string RegionColorer::PickColorForAssignment(Region* Region, std::vector<::Region*>* UnassignedRegions, std::map<std::string, std::string>* ColorAssignments)
 {
     const std::vector<std::string> AvailableColors = CalculateAvailableColors(Region, ColorAssignments);
 
@@ -89,12 +89,36 @@ std::string RegionColorer::PickColorForAssignment(Region* Region, std::map<std::
     {
         // If there are multiple colors, choose the one which will rule out the least neighbouring values
 
-        // Take each neighbour
-        // Check if color is available on the neighbour
-        // If yes, increase counter
-        // Repeat for each color
-        // Take color with lowest counter value
+        // Take each neighbour and calculate available colors
+        std::map<std::string, std::vector<std::string>> AvailableNeighbourColors = {};
+        for (const auto& NeighbourRegion : Region->GetNeighbouringRegions())
+        {
+            AvailableNeighbourColors[NeighbourRegion->GetRegionId()] = CalculateAvailableColors(NeighbourRegion, ColorAssignments);
+        }
+        
+        // For each available color, count how many are there in neighbour available colors
         SuitableColorId = AvailableColors[0];
+        unsigned int LeastColorCount = ColorIds.size();
+        for (const auto& Color : AvailableColors)
+        {
+            unsigned int ColorCount = 0;
+            for (const auto& NeighbourColorsPair : AvailableNeighbourColors) {
+                for (const auto& NeighbourColor : NeighbourColorsPair.second)
+                {
+                    if (NeighbourColor == Color)
+                    {
+                        ColorCount++;
+                    }
+                }
+            }
+
+            // The one with lowest count wins - it rules out the least neighbouring available colors
+            if (ColorCount < LeastColorCount)
+            {
+                SuitableColorId = Color;
+                LeastColorCount = ColorCount;
+            }
+        }
     }
 
     return SuitableColorId;
