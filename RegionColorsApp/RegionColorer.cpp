@@ -1,7 +1,5 @@
 ﻿#include "RegionColorer.h"
-
 #include <iostream>
-
 #include "ColorAssignmentException.h"
 
 RegionColorer::RegionColorer(std::vector<std::string> ColorIds)
@@ -11,8 +9,6 @@ RegionColorer::RegionColorer(std::vector<std::string> ColorIds)
 
 std::map<std::string, std::string>  RegionColorer::AssignColorsToRegions(std::vector<Region*> Regions)
 {
-    std::cout << "Assigning " << ColorIds.size() << " colors to " << Regions.size() << " regions." << std::endl;
-
     std::map<std::string, std::string> ColorAssignments = {};
 
     while (ColorAssignments.size() < Regions.size())
@@ -28,8 +24,6 @@ std::map<std::string, std::string>  RegionColorer::AssignColorsToRegions(std::ve
         
         std::string SuitableColorId = PickColorForAssignment(NextRegionForAssignment, &UnassignedRegions, &ColorAssignments);
         ColorAssignments[NextRegionForAssignment->GetRegionId()] = SuitableColorId;
-
-        std::cout << "Assigned color " << SuitableColorId << " to " << NextRegionForAssignment->GetRegionId() << std::endl;
     }
     
     return ColorAssignments;

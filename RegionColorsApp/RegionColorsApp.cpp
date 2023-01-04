@@ -41,7 +41,18 @@ int main(int argc, char* argv[])
 
     try
     {
+        std::cout << "Region colorer library demo: Assigning RGB colors to Australia:" << std::endl;
+        std::cout << "---------------------------------------------------------------" << std::endl;
+        
         std::map<std::string, std::string> RegionsWithColors = Colorer->AssignColorsToRegions(SampleRegions);
+
+        for (const auto& RegionColorPair : RegionsWithColors)
+        {
+            std::cout << RegionColorPair.first << ": " << RegionColorPair.second << std::endl;
+        }
+
+        std::cout << "---------------------------------------------------------------" << std::endl;
+        
         return 0;
     }
     catch (ColorAssignmentException& e)
